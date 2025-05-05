@@ -1,7 +1,7 @@
 name: Deploy and test cluster
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
 
 permissions:
   contents: read
