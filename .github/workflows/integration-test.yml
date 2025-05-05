@@ -19,7 +19,7 @@ jobs:
     - name: Checkout ansible-tools
       uses: actions/checkout@v4
       with:
-      repository: https://github.com/mxsrc/sb-ansible
+        repository: https://github.com/mxsrc/sb-ansible
         path: ansible
 
     - name: Deploy cluster
