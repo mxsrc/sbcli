@@ -1,0 +1,30 @@
+name: Deploy and test cluster
+
+on:
+  workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout sbcli
+      uses: actions/checkout@v4
+      with:
+        path: sbcli
+
+    - name: Checkout ansible-tools
+      uses: actions/checkout@v4
+      with:
+      repository: https://github.com/mxsrc/sb-ansible
+        path: ansible
+
+    - name: Deploy cluster
+      run: |
+        cd ansible
+        ansible -i /etc/cluster -m synchronize -a 'src=$checkout dest=sbcli' all
+        ansible -i /etc/cluster -m docker_image_build -a 'name=sbimage path=sbcli dockerfile=docker/Dockerfile' all
+        ansible-playbook -i /etc/cluster -e 'sbcli_package=/root/sbcli sb_image=sbimage' cluster.yml
