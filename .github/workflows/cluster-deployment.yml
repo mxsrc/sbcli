@@ -21,12 +21,12 @@ jobs:
       with:
         path: sbcli
 
-    - name: Checkout ansible-tools
+    - name: Checkout deployment tooling
       uses: actions/checkout@v4
       with:
         repository: simplyblock-io/simplyBlockDeploy
         path: deploy
-        branch: vmware
+        ref: vmware
 
     - name: Set docker image tag
       id: get_info
