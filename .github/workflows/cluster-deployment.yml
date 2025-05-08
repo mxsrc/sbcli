@@ -37,7 +37,7 @@ jobs:
         else
           TAG=$(echo ${GITHUB_REF#refs/*/} | sed 's/\//-/g')
         fi
-        eval $(python3 inventory.py inventory/${{ github.event.inputs.cluster }})
+        eval $(python3 inventory.py inventory/${{ github.event.inputs.cluster }}.yml)
         export NDCS=1
         export NPCS=1
         export BS=4096
