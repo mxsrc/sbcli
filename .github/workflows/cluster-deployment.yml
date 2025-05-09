@@ -15,6 +15,11 @@ jobs:
   deploy:
     runs-on: self-hosted
 
+    outputs:
+      cluster_id: ${{ steps.deployment.outputs.cluster_id }}
+      cluster_ip: ${{ steps.deployment.outputs.cluster_ip }}
+      cluster_secret: ${{ steps.deployment.outputs.cluster_secret }}
+
     steps:
     - name: Checkout sbcli
       uses: actions/checkout@v4
@@ -29,6 +34,7 @@ jobs:
         ref: deployment-test
 
     - name: Deploy cluster
+      id: deployment
       run: |
         cd deploy
         if [[ "${{github.ref}}" == refs/pull/* ]]; then
@@ -46,3 +52,18 @@ jobs:
         export SBCLI_INSTALL_SOURCE=${{ github.repositoryUrl }}@${{ github.sha }}
         export SIMPLY_BLOCK_DOCKER_IMAGE=public.ecr.aws/simply-block/simplyblock:$TAG
         ./bootstrap-cluster.sh --max-lvol 10 --max-snap 10 --max-size 400G --number-of-devices 1 --sbcli-cmd sbcli-dev --spdk-debug
+
+  test:
+    runs-on: self-hosted
+    needs: deploy
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Run tests
+      run: |
+        pytest simplyblock_web \
+          --entrypoint=${{ needs.deploy.outputs.cluster_ip }} \
+          --cluster=${{ needs.deploy.outputs.cluster_id }} \
+          --secret=${{ needs.deploy.outputs.cluster_secret }}
